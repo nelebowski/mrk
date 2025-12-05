@@ -1357,8 +1357,13 @@
     }
 
     async function fetchGiftsPage(page) {
-      const body = currentSearchBody || buildSearchBody();
-      const url = API_BASE + "/gifts?page=" + page + "&per_page=" + SERVER_PAGE_SIZE;
+      const searchBody = currentSearchBody || buildSearchBody();
+      const body = {
+        ...searchBody,
+        page,
+        per_page: SERVER_PAGE_SIZE
+      };
+      const url = API_BASE + "/gifts";
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1414,7 +1419,20 @@
         serverHasMore = items.length > 0;
       }
 
+      let nextPage = page + 1;
+      if (meta) {
+        if (meta.next_page != null) {
+          nextPage = meta.next_page;
+        } else if (meta.next_page_token != null) {
+          nextPage = meta.next_page_token;
+        } else if (meta.page != null && typeof meta.page === "number") {
+          nextPage = meta.page + 1;
+        }
+      }
+
       buildCollectionModalItems();
+
+      return { nextPage };
     }
 
     async function searchGifts() {
@@ -1431,8 +1449,8 @@
 
       setStatus("Загрузка подарков…", true);
       try {
-        await fetchGiftsPage(serverPage);
-        serverPage += 1;
+        const { nextPage } = await fetchGiftsPage(serverPage);
+        serverPage = nextPage;
 
         if (!lastGifts.length) {
           clearResults();
@@ -1460,8 +1478,8 @@
         } else if (serverHasMore) {
           isLoadingMore = true;
           try {
-            await fetchGiftsPage(serverPage);
-            serverPage += 1;
+            const { nextPage } = await fetchGiftsPage(serverPage);
+            serverPage = nextPage;
             renderNextChunk();
           } catch (err) {
             console.error(err);
