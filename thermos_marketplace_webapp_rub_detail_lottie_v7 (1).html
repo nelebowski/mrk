@@ -8,7 +8,8 @@
     :root {
       --bg-page: #111111;
       --bg-phone: #141414;
-      --bg-filter: #222222;
+      --bg-filter: #1d1d1f;
+      --bg-filter-stripe: #262626;
       --bg-card: #181818;
       --bg-card-inner: #202020;
       --bg-modal: #222222;
@@ -81,12 +82,14 @@
 
     .filter-pill {
       position: relative;
-      background: var(--bg-filter);
-      border-radius: 14px;
-      padding: 7px 10px 8px;
+      background: linear-gradient(180deg, var(--bg-filter-stripe), var(--bg-filter));
+      border-radius: 16px;
+      padding: 8px 10px 9px;
       flex: 1;
       border: 1px solid var(--border-soft);
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.65);
+      box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.65),
+        inset 0 1px 0 rgba(255, 255, 255, 0.03);
       display: flex;
       flex-direction: column;
       gap: 2px;
@@ -102,6 +105,7 @@
       font-size: 11px;
       color: var(--text-muted);
       line-height: 1.2;
+      letter-spacing: 0.01em;
     }
 
     .filter-value-row {
@@ -271,6 +275,8 @@
       align-items: center;
       justify-content: space-between;
       gap: 10px;
+      background: linear-gradient(180deg, #2a2a2a, #1c1c1c);
+      box-shadow: inset 0 -1px 0 #2b2b2b;
     }
 
     .modal-header-text {
@@ -337,8 +343,8 @@
     .modal-row {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 9px 16px;
+      gap: 12px;
+      padding: 11px 16px;
       border-bottom: 1px solid #2b2b2b;
       cursor: pointer;
       transition: background 0.12s ease;
@@ -372,6 +378,7 @@
     .modal-check.selected {
       border-color: var(--accent-blue);
       background: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(22, 137, 255, 0.15);
     }
 
     .modal-check-inner {
@@ -382,15 +389,16 @@
     }
 
     .modal-thumb {
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
-      background: #2b2b2b;
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      background: transparent;
       overflow: hidden;
       flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
     }
 
     .modal-thumb img {
@@ -398,6 +406,7 @@
       height: 100%;
       object-fit: cover;
       display: block;
+      border-radius: 14px;
     }
 
     .modal-thumb-circle {
@@ -419,11 +428,12 @@
 
     .modal-main-title {
       font-size: 14px;
-      font-weight: 500;
+      font-weight: 600;
       color: var(--text-primary);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      letter-spacing: 0.01em;
     }
 
     .modal-main-sub {
@@ -505,7 +515,7 @@
       max-width: 420px;
       margin: 12px;
       border-radius: 24px;
-      background: #1d1d1f;
+      background: linear-gradient(180deg, #22252a, #15171a);
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.9);
       display: flex;
       flex-direction: column;
@@ -516,23 +526,25 @@
       padding: 16px 16px 12px;
       text-align: center;
       position: relative;
+      background: radial-gradient(circle at center, rgba(255, 255, 255, 0.05), transparent 65%);
     }
 
     .gift-close {
       position: absolute;
       right: 12px;
       top: 12px;
-      width: 26px;
-      height: 26px;
+      width: 28px;
+      height: 28px;
       border-radius: 999px;
       border: none;
-      background: #333333;
+      background: #2c2c2f;
       color: var(--text-secondary);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       font-size: 16px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
     }
 
     .gift-image-wrap {
@@ -540,9 +552,10 @@
       max-width: 260px;
       margin: 8px auto 12px;
       border-radius: 28px;
-      background: transparent; /* убрали тёмно-синий квадрат */
+      background: transparent;
       padding: 0;
       overflow: hidden;
+      box-shadow: 0 10px 32px rgba(0, 0, 0, 0.6);
     }
 
     .gift-image-wrap img,
@@ -565,8 +578,9 @@
 
     .gift-main-title {
       font-size: 20px;
-      font-weight: 600;
+      font-weight: 700;
       margin-top: 4px;
+      letter-spacing: 0.01em;
     }
 
     .gift-main-id {
@@ -577,7 +591,7 @@
 
     .gift-actions-row {
       display: flex;
-      padding: 8px 12px 4px;
+      padding: 10px 12px 6px;
       gap: 8px;
     }
 
@@ -590,10 +604,12 @@
       font-size: 13px;
       padding: 8px 0;
       cursor: default;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
     }
 
     .gift-table {
       padding: 4px 16px 10px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent);
     }
 
     .gift-row {
@@ -645,37 +661,37 @@
   <div class="phone-shell">
     <div class="filter-bar">
       <div class="filter-pill" id="pill-collection">
-        <div class="filter-label">Collection</div>
+        <div class="filter-label">Коллекция</div>
         <div class="filter-value-row">
-          <span class="filter-value" id="collection-value">All</span>
+          <span class="filter-value" id="collection-value">Все</span>
           <span class="filter-arrow">▾</span>
         </div>
       </div>
 
       <div class="filter-pill disabled" id="pill-model">
-        <div class="filter-label">Model</div>
+        <div class="filter-label">Модель</div>
         <div class="filter-value-row">
-          <span class="filter-value" id="model-value">All</span>
+          <span class="filter-value" id="model-value">Все</span>
           <span class="filter-arrow">▾</span>
         </div>
       </div>
 
       <div class="filter-pill disabled" id="pill-backdrop">
-        <div class="filter-label">Background</div>
+        <div class="filter-label">Фон</div>
         <div class="filter-value-row">
-          <span class="filter-value" id="backdrop-value">All</span>
+          <span class="filter-value" id="backdrop-value">Все</span>
           <span class="filter-arrow">▾</span>
         </div>
       </div>
     </div>
 
     <div class="status-text" id="status-text">
-      <strong>Ready.</strong> Gifts sorted by price (low to high).
+      <strong>Готово.</strong> Подарки отсортированы по цене (сначала дешёвые).
     </div>
 
     <div id="results" class="grid"></div>
     <div id="empty" class="empty" style="display:none;">
-      No results. Try changing filters above.
+      Ничего не найдено. Попробуйте изменить фильтры выше.
     </div>
   </div>
 
@@ -683,21 +699,21 @@
     <div class="modal-container" role="dialog" aria-modal="true">
       <div class="modal-header">
         <div class="modal-header-text">
-          <div class="modal-title" id="modal-title">Collection</div>
-          <div class="modal-subtitle" id="modal-subtitle">Select one or more</div>
+          <div class="modal-title" id="modal-title">Коллекция</div>
+          <div class="modal-subtitle" id="modal-subtitle">Выберите одну или несколько</div>
         </div>
         <button class="modal-close-x" id="modal-close-x">✕</button>
       </div>
       <div class="modal-search-wrap">
-        <input id="modal-search" class="modal-search" placeholder="Search…" />
+        <input id="modal-search" class="modal-search" placeholder="Поиск…" />
       </div>
       <div class="modal-body">
-        <div class="modal-empty" id="modal-empty" style="display:none;">Nothing found.</div>
+        <div class="modal-empty" id="modal-empty" style="display:none;">Ничего не найдено.</div>
         <ul class="modal-list" id="modal-list"></ul>
       </div>
       <div class="modal-actions">
-        <button class="modal-btn modal-btn-secondary" id="modal-close-btn">Apply & Close</button>
-        <button class="modal-btn" id="modal-clear-btn">Clear all</button>
+        <button class="modal-btn modal-btn-secondary" id="modal-close-btn">Применить и закрыть</button>
+        <button class="modal-btn" id="modal-clear-btn">Сбросить всё</button>
       </div>
     </div>
   </div>
@@ -714,22 +730,22 @@
       </div>
 
       <div class="gift-actions-row">
-        <button class="gift-action-btn">Watch</button>
-        <button class="gift-action-btn">Status</button>
-        <button class="gift-action-btn">Share</button>
+        <button class="gift-action-btn">Смотреть</button>
+        <button class="gift-action-btn">Статус</button>
+        <button class="gift-action-btn">Поделиться</button>
       </div>
 
       <div class="gift-table">
         <div class="gift-row">
-          <div class="gift-row-label">Collection</div>
+          <div class="gift-row-label">Коллекция</div>
           <div class="gift-row-value" id="gift-collection"></div>
         </div>
         <div class="gift-row">
-          <div class="gift-row-label">Model</div>
+          <div class="gift-row-label">Модель</div>
           <div class="gift-row-value" id="gift-model"></div>
         </div>
         <div class="gift-row">
-          <div class="gift-row-label">Background</div>
+          <div class="gift-row-label">Фон</div>
           <div class="gift-row-value" id="gift-backdrop"></div>
         </div>
       </div>
@@ -757,6 +773,7 @@
 
     const modalOverlay = document.getElementById("modal-overlay");
     const modalTitle = document.getElementById("modal-title");
+    const modalSubtitle = document.getElementById("modal-subtitle");
     const modalSearch = document.getElementById("modal-search");
     const modalList = document.getElementById("modal-list");
     const modalEmpty = document.getElementById("modal-empty");
@@ -801,7 +818,7 @@
     };
 
     function setStatus(text, isLoading = false) {
-      statusText.textContent = (isLoading ? "Loading… " : "") + text;
+      statusText.textContent = (isLoading ? "Загрузка… " : "") + text;
     }
 
     function fromNanotons(nanotons) {
@@ -935,7 +952,7 @@
       if (gift.image_url || gift.lottie_url) {
         const img = document.createElement("img");
         img.src = gift.image_url || gift.lottie_url;
-        img.alt = gift.collection || "Gift";
+        img.alt = gift.collection || "Подарок";
         giftImageContainer.appendChild(img);
       }
     }
@@ -944,7 +961,7 @@
       currentGift = gift;
       setupGiftVisual(gift);
       giftTitle.textContent =
-        gift.collection || (gift.model && gift.model.name) || "Gift";
+        (gift.model && gift.model.name) || gift.collection || "Подарок";
       giftId.textContent = "#" + (gift.number ?? "????");
       giftCollection.textContent = gift.collection || "—";
       giftModelField.textContent = (gift.model && gift.model.name) || "—";
@@ -967,7 +984,7 @@
     }
 
     async function fetchCollections() {
-      setStatus("Gifts sorted by price (low to high). Loading collections…", true);
+      setStatus("Подарки отсортированы по цене (сначала дешёвые). Загружаем коллекции…", true);
       try {
         const res = await fetch(API_BASE + "/collections");
         if (!res.ok) throw new Error("HTTP " + res.status);
@@ -989,7 +1006,7 @@
         buildCollectionModalItems();
       } catch (err) {
         console.error(err);
-        setStatus("Error loading collections: " + err.message);
+        setStatus("Ошибка загрузки коллекций: " + err.message);
       }
     }
 
@@ -1060,11 +1077,22 @@
     }
 
     function buildSearchBody() {
-      const body = { ordering: "PRICE_ASC" };
+      const body = { ordering: "PRICE_ASC", limit: 200, offchain_only: true };
       if (selectedCollections.length) body.collections = selectedCollections.slice();
       if (selectedModels.length) body.models = selectedModels.slice();
       if (selectedBackdrops.length) body.backdrops = selectedBackdrops.slice();
       return body;
+    }
+
+    function isOffchainGift(gift) {
+      if (!gift) return false;
+      if (gift.offchain !== undefined) return !!gift.offchain;
+      if (gift.is_offchain !== undefined) return !!gift.is_offchain;
+      if (gift.onchain !== undefined) return !gift.onchain;
+      if (gift.chain) {
+        return String(gift.chain).toLowerCase().includes("off");
+      }
+      return true;
     }
 
     function clearResults() {
@@ -1089,7 +1117,7 @@
         if (gift.image_url || gift.lottie_url) {
           const img = document.createElement("img");
           img.src = gift.image_url || gift.lottie_url;
-          img.alt = gift.collection || "Gift";
+        img.alt = gift.collection || "Подарок";
           img.loading = "lazy";
           imgWrap.appendChild(img);
         }
@@ -1098,7 +1126,7 @@
         const title = document.createElement("div");
         title.className = "card-title";
         title.textContent =
-          (gift.model && gift.model.name) || gift.collection || "Gift";
+          (gift.model && gift.model.name) || gift.collection || "Подарок";
         card.appendChild(title);
 
         const subtitle = document.createElement("div");
@@ -1142,7 +1170,7 @@
             player.style.pointerEvents = "none";
             imgWrap.appendChild(player);
             hoverPlayer = player;
-          }, 1000);
+          }, 600);
         });
 
         card.addEventListener("mouseleave", () => {
@@ -1176,7 +1204,7 @@
       resultsGrid.style.display = "grid";
       emptyState.style.display = "none";
 
-      setStatus("Gifts sorted by price (low to high). Loading…", true);
+      setStatus("Подарки отсортированы по цене (сначала дешёвые). Загружаем результаты…", true);
       try {
         const body = buildSearchBody();
         const res = await fetch(API_BASE + "/gifts", {
@@ -1192,15 +1220,16 @@
           throw new Error("HTTP " + res.status + (t ? " – " + t : ""));
         }
         const data = await res.json();
-        lastGifts = (data && Array.isArray(data.items)) ? data.items : [];
+        const incoming = (data && Array.isArray(data.items)) ? data.items : [];
+        lastGifts = incoming.filter(isOffchainGift);
 
         if (!lastGifts.length) {
           clearResults();
-          setStatus("No gifts found for these filters.");
+          setStatus("Нет подарков по выбранным фильтрам.");
         } else {
           renderedCount = 0;
           renderNextChunk();
-          setStatus("Gifts sorted by price (low to high).");
+          setStatus("Подарки отсортированы по цене (сначала дешёвые).");
         }
 
         // Update collection floors from gifts just in case
@@ -1223,74 +1252,147 @@
       } catch (err) {
         console.error(err);
         clearResults();
-        setStatus("Error loading gifts: " + err.message);
+        setStatus("Ошибка загрузки подарков: " + err.message);
       }
     }
 
-    async function updateModelAndBackdropModalDataFromAttributes() {
-      if (selectedCollections.length !== 1) {
+    async function updateAttributeModalDataFromSelections() {
+      if (!selectedCollections.length) {
         modalState.data.model.items = [];
         modalState.data.backdrop.items = [];
         return;
       }
-      const collectionName = selectedCollections[0];
-      const attrs = await ensureAttributes(collectionName);
+
       const modelItems = [];
       const backdropItems = [];
 
-      if (attrs && Array.isArray(attrs.models)) {
-        for (const m of attrs.models) {
-          const priceRub =
-            m.stats && m.stats.floor != null
-              ? nanotonsToRub(m.stats.floor)
-              : null;
-          const rarity = m.rarity_per_mille ?? m.rarity ?? null;
-          const subtitle =
-            rarity != null ? `Rarity ${(rarity / 10).toFixed(1)}‰` : "";
-          modelItems.push({
-            id: m.name,
-            label: m.name,
-            subtitle,
-            priceRub,
-            imageUrl: m.image_url || modelPngUrl(collectionName, m.name)
-          });
+      for (let idx = 0; idx < selectedCollections.length; idx++) {
+        const collectionName = selectedCollections[idx];
+        const attrs = await ensureAttributes(collectionName);
+        if (!attrs) continue;
+
+        if (Array.isArray(attrs.models)) {
+          for (const m of attrs.models) {
+            const priceRub =
+              m.stats && m.stats.floor != null
+                ? nanotonsToRub(m.stats.floor)
+                : null;
+            const rarityRaw = m.rarity_per_mille ?? m.rarity ?? null;
+            const rarityPercent = rarityRaw != null ? rarityRaw / 10 : null;
+            const subtitle =
+              rarityPercent != null
+                ? `Редкость ${rarityPercent.toLocaleString("ru-RU", {
+                    minimumFractionDigits: 1,
+                    maximumFractionDigits: 1
+                  })}%`
+                : "";
+            modelItems.push({
+              id: `${collectionName}::${m.name}`,
+              value: m.name,
+              label: m.name,
+              subtitle,
+              priceRub,
+              rarityScore: rarityRaw,
+              orderIndex: idx,
+              imageUrl: m.image_url || modelPngUrl(collectionName, m.name)
+            });
+          }
         }
-      }
-      if (attrs && Array.isArray(attrs.backdrops)) {
-        for (const b of attrs.backdrops) {
-          const priceRub =
-            b.stats && b.stats.floor != null
-              ? nanotonsToRub(b.stats.floor)
-              : null;
-          const rarity = b.rarity_per_mille ?? b.rarity ?? null;
-          const subtitle =
-            rarity != null ? `Rarity ${(rarity / 10).toFixed(1)}‰` : "";
-          const centerHex = colorIntToHex(b.center_color);
-          backdropItems.push({
-            id: b.name,
-            label: b.name,
-            subtitle,
-            priceRub,
-            color: centerHex || guessColorFromName(b.name)
-          });
+
+        if (Array.isArray(attrs.backdrops)) {
+          for (const b of attrs.backdrops) {
+            const priceRub =
+              b.stats && b.stats.floor != null
+                ? nanotonsToRub(b.stats.floor)
+                : null;
+            const rarityRaw = b.rarity_per_mille ?? b.rarity ?? null;
+            const rarityPercent = rarityRaw != null ? rarityRaw / 10 : null;
+            const subtitle =
+              rarityPercent != null
+                ? `Редкость ${rarityPercent.toLocaleString("ru-RU", {
+                    minimumFractionDigits: 1,
+                    maximumFractionDigits: 1
+                  })}%`
+                : "";
+            const centerHex = colorIntToHex(b.center_color);
+            backdropItems.push({
+              id: `${collectionName}::${b.name}`,
+              value: b.name,
+              label: b.name,
+              subtitle,
+              priceRub,
+              orderIndex: idx,
+              color: centerHex || guessColorFromName(b.name)
+            });
+          }
         }
       }
 
-      modalState.data.model.items = modelItems.sort((a, b) =>
-        a.label.localeCompare(b.label)
+      const modelSort = (a, b) => {
+        const aSel = modalState.data.model.selected.has(a.id) ? 0 : 1;
+        const bSel = modalState.data.model.selected.has(b.id) ? 0 : 1;
+        if (aSel !== bSel) return aSel - bSel;
+        if (a.orderIndex !== b.orderIndex) return a.orderIndex - b.orderIndex;
+        if (
+          a.rarityScore != null &&
+          b.rarityScore != null &&
+          a.rarityScore !== b.rarityScore
+        ) {
+          return b.rarityScore - a.rarityScore;
+        }
+        return a.label.localeCompare(b.label, "ru");
+      };
+
+      const backdropSort = (a, b) => {
+        const aSel = modalState.data.backdrop.selected.has(a.id) ? 0 : 1;
+        const bSel = modalState.data.backdrop.selected.has(b.id) ? 0 : 1;
+        if (aSel !== bSel) return aSel - bSel;
+        if (a.orderIndex !== b.orderIndex) return a.orderIndex - b.orderIndex;
+        return a.label.localeCompare(b.label, "ru");
+      };
+
+      modalState.data.model.items = modelItems.sort(modelSort);
+      modalState.data.backdrop.items = backdropItems.sort(backdropSort);
+
+      pruneModalSelections("model");
+      pruneModalSelections("backdrop");
+
+      const modelMap = new Map(modalState.data.model.items.map((i) => [i.id, i]));
+      const backdropMap = new Map(
+        modalState.data.backdrop.items.map((i) => [i.id, i])
       );
-      modalState.data.backdrop.items = backdropItems.sort((a, b) =>
-        a.label.localeCompare(b.label)
-      );
+      selectedModels = Array.from(modalState.data.model.selected)
+        .map((id) => {
+          const item = modelMap.get(id);
+          return item ? item.value : null;
+        })
+        .filter(Boolean);
+      selectedBackdrops = Array.from(modalState.data.backdrop.selected)
+        .map((id) => {
+          const item = backdropMap.get(id);
+          return item ? item.value : null;
+        })
+        .filter(Boolean);
+      updateFilterLabel(modelValue, selectedModels);
+      updateFilterLabel(backdropValue, selectedBackdrops);
 
       if (modalState.current === "model" || modalState.current === "backdrop") {
         renderModalList();
       }
     }
 
+    function pruneModalSelections(kind) {
+      const state = modalState.data[kind];
+      if (!state) return;
+      const validIds = new Set((state.items || []).map((i) => i.id));
+      for (const id of Array.from(state.selected)) {
+        if (!validIds.has(id)) state.selected.delete(id);
+      }
+    }
+
     function updateFilterLabel(el, selectedArray) {
       if (!selectedArray.length) {
-        el.textContent = "All";
+        el.textContent = "Все";
       } else if (selectedArray.length === 1) {
         el.textContent = selectedArray[0];
       } else {
@@ -1305,14 +1407,17 @@
       modalEmpty.style.display = "none";
 
       if (kind === "collection") {
-        modalTitle.textContent = "Collection";
-        modalSearch.placeholder = "Search by collection";
+        modalTitle.textContent = "Коллекция";
+        modalSearch.placeholder = "Поиск по коллекциям";
+        modalSubtitle.textContent = "Выберите одну или несколько коллекций";
       } else if (kind === "model") {
-        modalTitle.textContent = "Model";
-        modalSearch.placeholder = "Search by model";
+        modalTitle.textContent = "Модель";
+        modalSearch.placeholder = "Поиск по моделям";
+        modalSubtitle.textContent = "Модели выбранных коллекций";
       } else if (kind === "backdrop") {
-        modalTitle.textContent = "Background";
-        modalSearch.placeholder = "Search by background";
+        modalTitle.textContent = "Фон";
+        modalSearch.placeholder = "Поиск по фонам";
+        modalSubtitle.textContent = "Фоны выбранных коллекций";
       }
 
       renderModalList();
@@ -1335,28 +1440,40 @@
       if (current === "collection") {
         selectedCollections = selected;
         updateFilterLabel(collectionValue, selectedCollections);
-        if (selectedCollections.length === 1) {
-          pillModel.classList.remove("disabled");
-          pillBackdrop.classList.remove("disabled");
-          updateModelAndBackdropModalDataFromAttributes().then(() => {
-            searchGifts();
-          });
-          return;
-        } else {
+        if (!selectedCollections.length) {
           pillModel.classList.add("disabled");
           pillBackdrop.classList.add("disabled");
           selectedModels = [];
           selectedBackdrops = [];
           modalState.data.model.selected.clear();
           modalState.data.backdrop.selected.clear();
-          modelValue.textContent = "All";
-          backdropValue.textContent = "All";
+          modelValue.textContent = "Все";
+          backdropValue.textContent = "Все";
+          searchGifts();
+          return;
         }
+
+        pillModel.classList.remove("disabled");
+        pillBackdrop.classList.remove("disabled");
+        updateAttributeModalDataFromSelections().then(() => {
+          searchGifts();
+        });
+        return;
       } else if (current === "model") {
-        selectedModels = selected;
+        selectedModels = selected
+          .map((id) => {
+            const item = (state.items || []).find((i) => i.id === id);
+            return item ? item.value : null;
+          })
+          .filter(Boolean);
         updateFilterLabel(modelValue, selectedModels);
       } else if (current === "backdrop") {
-        selectedBackdrops = selected;
+        selectedBackdrops = selected
+          .map((id) => {
+            const item = (state.items || []).find((i) => i.id === id);
+            return item ? item.value : null;
+          })
+          .filter(Boolean);
         updateFilterLabel(backdropValue, selectedBackdrops);
       }
 
@@ -1380,7 +1497,19 @@
         const aSel = state.selected.has(a.id) ? 0 : 1;
         const bSel = state.selected.has(b.id) ? 0 : 1;
         if (aSel !== bSel) return aSel - bSel;
-        return a.label.localeCompare(b.label);
+        if (current !== "collection") {
+          const aOrder = a.orderIndex ?? 999;
+          const bOrder = b.orderIndex ?? 999;
+          if (aOrder !== bOrder) return aOrder - bOrder;
+          if (
+            a.rarityScore != null &&
+            b.rarityScore != null &&
+            a.rarityScore !== b.rarityScore
+          ) {
+            return b.rarityScore - a.rarityScore;
+          }
+        }
+        return a.label.localeCompare(b.label, "ru");
       });
 
       if (!filtered.length) {
@@ -1465,7 +1594,7 @@
 
         const priceLabel = document.createElement("div");
         priceLabel.className = "modal-price-label";
-        priceLabel.textContent = "Floor price";
+        priceLabel.textContent = "Мин. цена";
 
         priceBlock.appendChild(priceRow);
         priceBlock.appendChild(priceLabel);
@@ -1481,7 +1610,7 @@
     });
 
     modalCloseX.addEventListener("click", () => {
-      closeModal(false);
+      closeModal(true);
     });
 
     modalCloseBtn.addEventListener("click", () => {
@@ -1513,16 +1642,16 @@
 
     pillModel.addEventListener("click", () => {
       if (pillModel.classList.contains("disabled")) return;
-      if (selectedCollections.length !== 1) return;
-      updateModelAndBackdropModalDataFromAttributes().then(() => {
+      if (!selectedCollections.length) return;
+      updateAttributeModalDataFromSelections().then(() => {
         openModal("model");
       });
     });
 
     pillBackdrop.addEventListener("click", () => {
       if (pillBackdrop.classList.contains("disabled")) return;
-      if (selectedCollections.length !== 1) return;
-      updateModelAndBackdropModalDataFromAttributes().then(() => {
+      if (!selectedCollections.length) return;
+      updateAttributeModalDataFromSelections().then(() => {
         openModal("backdrop");
       });
     });
