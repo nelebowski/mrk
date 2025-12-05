@@ -1,0 +1,1731 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Thermos Gifts – NFT маркетплейс</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg-page: #111111;
+      --bg-phone: #141414;
+      --bg-filter: #222222;
+      --bg-card: #181818;
+      --bg-card-inner: #202020;
+      --bg-modal: #222222;
+      --bg-modal-actions: #151515;
+      --text-primary: #f5f5f5;
+      --text-secondary: #cccccc;
+      --text-muted: #8b8b8b;
+      --text-soft: #a0a0a0;
+      --accent-blue: #1689ff;
+      --accent-blue-dark: #0d68cc;
+      --border-soft: #2a2a2a;
+      --shadow-card: 0 8px 18px rgba(0, 0, 0, 0.7);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1e1e1e 0, #111111 55%, #050505 100%);
+      color: var(--text-primary);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .phone-shell {
+      width: 100%;
+      max-width: 420px;
+      min-height: 640px;
+      height: calc(100% - 32px);
+      margin: 16px 12px;
+      border-radius: 24px;
+      background: radial-gradient(circle at top left, #1f1f1f 0, #141414 55%, #101010 100%);
+      box-shadow:
+        0 18px 40px rgba(0, 0, 0, 0.9),
+        0 0 0 1px rgba(0, 0, 0, 0.9);
+      padding: 14px 12px 18px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    @media (max-width: 480px) {
+      .phone-shell {
+        max-width: 100%;
+        border-radius: 20px;
+        padding: 10px 10px 14px;
+      }
+    }
+
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .filter-pill {
+      position: relative;
+      background: var(--bg-filter);
+      border-radius: 14px;
+      padding: 7px 10px 8px;
+      flex: 1;
+      border: 1px solid var(--border-soft);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.65);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      cursor: pointer;
+    }
+
+    .filter-pill.disabled {
+      opacity: 0.45;
+      cursor: default;
+    }
+
+    .filter-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.2;
+    }
+
+    .filter-value-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .filter-value {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .filter-arrow {
+      font-size: 11px;
+      color: var(--text-secondary);
+      opacity: 0.9;
+    }
+
+    .status-text {
+      font-size: 12px;
+      color: var(--text-secondary);
+      min-height: 16px;
+      flex-shrink: 0;
+    }
+
+    .status-text strong {
+      color: var(--text-primary);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      align-items: stretch;
+      flex: 1 1 auto;
+      overflow-y: auto;
+      min-height: 0;
+      padding-right: 2px;
+      padding-bottom: 4px;
+      scrollbar-width: thin;
+      scrollbar-color: #333333 transparent;
+    }
+
+    .grid::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .grid::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .grid::-webkit-scrollbar-thumb {
+      background: #333333;
+      border-radius: 999px;
+    }
+
+    @media (max-width: 380px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: 18px;
+      padding: 10px 10px 12px;
+      box-shadow: var(--shadow-card);
+      border: 1px solid #101010;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .card-image-wrapper {
+      background: var(--bg-card-inner);
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+      min-height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-image-wrapper img {
+      width: 100%;
+      height: auto;
+      display: block;
+      max-height: 220px;
+      object-fit: cover;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .card-subtitle {
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    .price-row {
+      margin-top: 8px;
+    }
+
+    .price-pill {
+      border-radius: 999px;
+      background: var(--accent-blue);
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow:
+        0 4px 10px rgba(0, 0, 0, 0.7),
+        0 0 0 1px rgba(7, 55, 120, 0.9);
+    }
+
+    .price-value {
+      min-width: 0;
+    }
+
+    .empty {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+      flex-shrink: 0;
+    }
+
+    /* ------------ Модалка фильтров ------------ */
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 50;
+    }
+
+    .modal-container {
+      width: 100%;
+      max-width: 420px;
+      margin-bottom: 8px;
+      border-radius: 22px;
+      background: var(--bg-modal);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.85);
+      display: flex;
+      flex-direction: column;
+      max-height: 90vh;
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 14px 16px 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .modal-header-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+
+    .modal-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .modal-close-x {
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      border: none;
+      background: #333333;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .modal-search-wrap {
+      padding: 0 16px 8px;
+    }
+
+    .modal-search {
+      width: 100%;
+      border-radius: 999px;
+      border: 1px solid #3a3a3a;
+      background: #181818;
+      padding: 8px 12px;
+      color: var(--text-primary);
+      font-size: 13px;
+      outline: none;
+    }
+
+    .modal-search::placeholder {
+      color: var(--text-muted);
+    }
+
+    .modal-body {
+      overflow-y: auto;
+      padding: 2px 0 8px;
+      scrollbar-width: thin;
+      scrollbar-color: #333333 transparent;
+    }
+
+    .modal-body::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .modal-body::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .modal-body::-webkit-scrollbar-thumb {
+      background: #333333;
+      border-radius: 999px;
+    }
+
+    .modal-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .modal-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 16px;
+      border-bottom: 1px solid #2b2b2b;
+      cursor: pointer;
+      transition: background 0.12s ease;
+    }
+
+    .modal-row:last-child {
+      border-bottom: none;
+    }
+
+    .modal-row:hover {
+      background: #262626;
+    }
+
+    .modal-row.selected {
+      background: #232323;
+    }
+
+    .modal-check {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      border: 2px solid #555555;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-sizing: border-box;
+    }
+
+    .modal-check.selected {
+      border-color: var(--accent-blue);
+      background: var(--accent-blue);
+    }
+
+    .modal-check-inner {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #ffffff;
+    }
+
+    .modal-thumb {
+      width: 40px;
+      height: 40px;
+      border-radius: 0;
+      background: transparent;
+      overflow: visible;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-thumb img {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .modal-thumb-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      background: #4b5563;
+      flex-shrink: 0;
+    }
+
+    .modal-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .modal-main-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .modal-main-sub {
+      font-size: 11px;
+      color: #5cc8ff;
+    }
+
+    .modal-price-block {
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+
+    .modal-price-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .modal-price-value {
+      color: var(--text-primary);
+      min-width: 0;
+    }
+
+    .modal-price-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-soft);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+      padding: 8px 16px 12px;
+      border-top: 1px solid #2b2b2b;
+      background: var(--bg-modal-actions);
+    }
+
+    .modal-btn {
+      flex: 1;
+      border-radius: 999px;
+      border: none;
+      background: #262626;
+      color: var(--text-primary);
+      font-size: 14px;
+      font-weight: 500;
+      padding: 9px 0;
+      cursor: pointer;
+    }
+
+    .modal-btn-secondary {
+      background: #272727;
+    }
+
+    .modal-empty {
+      padding: 8px 16px 12px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* ------------- Детальная карточка подарка ------------- */
+
+    .gift-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 60;
+    }
+
+    .gift-sheet {
+      width: 100%;
+      max-width: 420px;
+      margin: 12px;
+      border-radius: 24px;
+      background: #1d1d1f;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.9);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .gift-header {
+      padding: 16px 16px 8px;
+      text-align: center;
+      position: relative;
+    }
+
+    .gift-close {
+      position: absolute;
+      right: 12px;
+      top: 12px;
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      border: none;
+      background: #333333;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .gift-image-wrap {
+      width: 100%;
+      max-width: 260px;
+      margin: 8px auto 12px;
+      border-radius: 28px;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .gift-image-wrap img,
+    .gift-image-wrap lottie-player {
+      width: 100%;
+      border-radius: 28px;
+      display: block;
+    }
+
+    #gift-image-container {
+      border-radius: 28px;
+      overflow: hidden;
+    }
+
+    #gift-image-container > lottie-player,
+    #gift-image-container > img {
+      width: 100%;
+      display: block;
+    }
+
+    .gift-main-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .gift-main-id {
+      font-size: 12px;
+      color: var(--text-soft);
+      margin-top: 2px;
+    }
+
+    .gift-actions-row {
+      display: flex;
+      padding: 8px 12px 6px;
+      gap: 8px;
+    }
+
+    .gift-action-btn {
+      flex: 1;
+      border-radius: 999px;
+      border: none;
+      background: #262626;
+      color: var(--text-primary);
+      font-size: 13px;
+      padding: 8px 0;
+      cursor: default;
+    }
+
+    .gift-table {
+      margin: 6px 16px 10px;
+      border-radius: 16px;
+      background: #151518;
+      border: 1px solid #27272a;
+      overflow: hidden;
+    }
+
+    .gift-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 12px;
+      border-bottom: 1px solid #27272a;
+      font-size: 13px;
+    }
+
+    .gift-row:last-child {
+      border-bottom: none;
+    }
+
+    .gift-row-label {
+      color: var(--text-soft);
+      font-size: 12px;
+    }
+
+    .gift-row-value {
+      color: var(--text-primary);
+      font-weight: 500;
+      max-width: 65%;
+      text-align: right;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+      font-size: 13px;
+    }
+
+    .gift-trait-name {
+      color: #38bdf8;
+      white-space: nowrap;
+    }
+
+    .gift-trait-rarity {
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.16);
+      color: #7dd3fc;
+      white-space: nowrap;
+    }
+
+    .gift-buy-wrap {
+      padding: 10px 16px 16px;
+    }
+
+    .gift-buy-button {
+      width: 100%;
+      border-radius: 999px;
+      border: none;
+      background: var(--accent-blue);
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 600;
+      padding: 11px 0;
+      cursor: default;
+      box-shadow:
+        0 6px 14px rgba(0, 0, 0, 0.8),
+        0 0 0 1px rgba(7, 55, 120, 0.9);
+    }
+  </style>
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+</head>
+<body>
+  <div class="phone-shell">
+    <div class="filter-bar">
+      <div class="filter-pill" id="pill-collection">
+        <div class="filter-label">Коллекция</div>
+        <div class="filter-value-row">
+          <span class="filter-value" id="collection-value">Все</span>
+          <span class="filter-arrow">▾</span>
+        </div>
+      </div>
+
+      <div class="filter-pill" id="pill-model">
+        <div class="filter-label">Модель</div>
+        <div class="filter-value-row">
+          <span class="filter-value" id="model-value">Все</span>
+          <span class="filter-arrow">▾</span>
+        </div>
+      </div>
+
+      <div class="filter-pill" id="pill-backdrop">
+        <div class="filter-label">Фон</div>
+        <div class="filter-value-row">
+          <span class="filter-value" id="backdrop-value">Все</span>
+          <span class="filter-arrow">▾</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="status-text" id="status-text">
+      <strong>Готово.</strong> Подарки отсортированы по цене (сначала дешёвые).
+    </div>
+
+    <div id="results" class="grid"></div>
+    <div id="empty" class="empty" style="display:none;">
+      Нет результатов. Попробуйте изменить фильтры выше.
+    </div>
+  </div>
+
+  <!-- Модалка фильтров -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal-container" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <div class="modal-header-text">
+          <div class="modal-title" id="modal-title">Коллекции</div>
+          <div class="modal-subtitle" id="modal-subtitle">Выберите один или несколько вариантов</div>
+        </div>
+        <button class="modal-close-x" id="modal-close-x">✕</button>
+      </div>
+      <div class="modal-search-wrap">
+        <input id="modal-search" class="modal-search" placeholder="Поиск по коллекции" />
+      </div>
+      <div class="modal-body">
+        <div class="modal-empty" id="modal-empty" style="display:none;">Ничего не найдено.</div>
+        <ul class="modal-list" id="modal-list"></ul>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn-secondary" id="modal-close-btn">Применить и закрыть</button>
+        <button class="modal-btn" id="modal-clear-btn">Очистить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Детальная карточка подарка -->
+  <div class="gift-overlay" id="gift-overlay">
+    <div class="gift-sheet" role="dialog" aria-modal="true">
+      <div class="gift-header">
+        <button class="gift-close" id="gift-close">✕</button>
+        <div class="gift-image-wrap">
+          <div id="gift-image-container"></div>
+        </div>
+        <div class="gift-main-title" id="gift-title"></div>
+        <div class="gift-main-id" id="gift-id"></div>
+      </div>
+
+      <div class="gift-actions-row">
+        <button class="gift-action-btn">Смотреть</button>
+        <button class="gift-action-btn">Статус</button>
+        <button class="gift-action-btn">Поделиться</button>
+      </div>
+
+      <div class="gift-table" id="gift-traits"></div>
+
+      <div class="gift-buy-wrap">
+        <button class="gift-buy-button" id="gift-buy-button">Купить</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "https://proxy.thermos.gifts/api/v1";
+
+    const statusText = document.getElementById("status-text");
+    const resultsGrid = document.getElementById("results");
+    const emptyState = document.getElementById("empty");
+
+    const pillCollection = document.getElementById("pill-collection");
+    const pillModel = document.getElementById("pill-model");
+    const pillBackdrop = document.getElementById("pill-backdrop");
+
+    const collectionValue = document.getElementById("collection-value");
+    const modelValue = document.getElementById("model-value");
+    const backdropValue = document.getElementById("backdrop-value");
+
+    const modalOverlay = document.getElementById("modal-overlay");
+    const modalTitle = document.getElementById("modal-title");
+    const modalSearch = document.getElementById("modal-search");
+    const modalList = document.getElementById("modal-list");
+    const modalEmpty = document.getElementById("modal-empty");
+    const modalCloseX = document.getElementById("modal-close-x");
+    const modalCloseBtn = document.getElementById("modal-close-btn");
+    const modalClearBtn = document.getElementById("modal-clear-btn");
+
+    const giftOverlay = document.getElementById("gift-overlay");
+    const giftClose = document.getElementById("gift-close");
+    const giftImageContainer = document.getElementById("gift-image-container");
+    const giftTitle = document.getElementById("gift-title");
+    const giftId = document.getElementById("gift-id");
+    const giftTraitsContainer = document.getElementById("gift-traits");
+    const giftBuyButton = document.getElementById("gift-buy-button");
+
+    let giftLottiePlayer = null;
+    let currentGift = null;
+
+    let collectionsCache = [];
+    let attributesCache = {};
+    let lastGifts = [];
+    let renderedCount = 0;
+    const LOCAL_PAGE_SIZE = 24;
+    const SERVER_PAGE_SIZE = 60;
+    let serverPage = 1;
+    let serverHasMore = true;
+    let isLoadingMore = false;
+    let currentSearchBody = null;
+
+    let selectedCollections = [];
+    let selectedModels = [];
+    let selectedBackdrops = [];
+
+    const globalCollectionStats = new Map();
+    const collectionPreviewImages = new Map();
+
+    const modalState = {
+      current: null,
+      searchTerm: "",
+      data: {
+        collection: { items: [], selected: new Set() },
+        model: { items: [], selected: new Set() },
+        backdrop: { items: [], selected: new Set() }
+      }
+    };
+
+    function setStatus(text, isLoading = false) {
+      statusText.textContent = (isLoading ? "Загрузка… " : "") + text;
+    }
+
+    function fromNanotons(nanotons) {
+      if (!nanotons && nanotons !== "0") return null;
+      const n = Number(nanotons);
+      if (Number.isNaN(n)) return null;
+      return n / 1_000_000_000;
+    }
+
+    const TON_TO_RUB = 150;
+    const PRICE_MARKUP = 0.3;
+    const PRICE_MULTIPLIER = TON_TO_RUB * (1 + PRICE_MARKUP);
+
+    function nanotonsToRub(nanotons) {
+      const tons = fromNanotons(nanotons);
+      if (tons == null) return null;
+      return tons * PRICE_MULTIPLIER;
+    }
+
+    function formatRub(value) {
+      if (value == null) return "—";
+      const rounded = Math.round(value);
+      return rounded.toLocaleString("ru-RU") + " ₽";
+    }
+
+    function slugForFragment(name) {
+      if (!name) return null;
+      return name.toLowerCase().replace(/[^a-z0-9]+/g, "");
+    }
+
+    function buildLottieUrlFromGift(gift) {
+      if (!gift || !gift.collection || gift.number == null) return null;
+      const slug = slugForFragment(gift.collection);
+      if (!slug) return null;
+      return "https://nft.fragment.com/gift/" + slug + "-" + gift.number + ".lottie.json";
+    }
+
+    function colorIntToHex(intColor) {
+      if (typeof intColor !== "number") return null;
+      const hex = intColor.toString(16).padStart(6, "0");
+      return "#" + hex;
+    }
+
+    function guessColorFromName(name) {
+      if (!name) return "#4b5563";
+      const lower = name.toLowerCase();
+      const map = [
+        ["red", "#f97373"],
+        ["crimson", "#f56565"],
+        ["scarlet", "#f43f5e"],
+        ["pink", "#fb7185"],
+        ["rose", "#fb7185"],
+        ["magenta", "#db2777"],
+        ["lilac", "#a855f7"],
+        ["violet", "#8b5cf6"],
+        ["purple", "#8b5cf6"],
+        ["indigo", "#6366f1"],
+        ["blue", "#3b82f6"],
+        ["cyan", "#22d3ee"],
+        ["aqua", "#22d3ee"],
+        ["teal", "#14b8a6"],
+        ["turquoise", "#22c55e"],
+        ["mint", "#4ade80"],
+        ["green", "#22c55e"],
+        ["lime", "#84cc16"],
+        ["yellow", "#eab308"],
+        ["gold", "#fbbf24"],
+        ["amber", "#f59e0b"],
+        ["orange", "#fb923c"],
+        ["peach", "#fdba74"],
+        ["brown", "#92400e"],
+        ["coffee", "#78350f"],
+        ["bronze", "#b45309"],
+        ["silver", "#e5e7eb"],
+        ["gray", "#9ca3af"],
+        ["grey", "#9ca3af"],
+        ["smoke", "#6b7280"],
+        ["black", "#111827"],
+        ["white", "#f3f4f6"]
+      ];
+      for (const [word, color] of map) {
+        if (lower.includes(word)) return color;
+      }
+      let hash = 0;
+      for (let i = 0; i < lower.length; i++) {
+        hash = (hash * 31 + lower.charCodeAt(i)) | 0;
+      }
+      const hue = Math.abs(hash) % 360;
+      return `hsl(${hue}, 70%, 55%)`;
+    }
+
+    function slugCollection(name) {
+      return encodeURIComponent(name.toLowerCase());
+    }
+
+    function modelPngUrl(collectionName, modelName) {
+      return (
+        "https://gifts.coffin.meme/" +
+        slugCollection(collectionName) +
+        "/" +
+        encodeURIComponent(modelName) +
+        ".png"
+      );
+    }
+
+    function isOffchainGift(gift) {
+      if (!gift) return false;
+      if (gift.is_offchain === true || gift.offchain === true) return true;
+      if (gift.is_onchain === false || gift.onchain === false) return true;
+      if (gift.blockchain === "OFFCHAIN" || gift.chain === "OFFCHAIN") return true;
+      if (gift.blockchain === "TON" || gift.onchain === true || gift.is_onchain === true) return false;
+      return true;
+    }
+
+    function setupGiftVisual(gift) {
+      giftImageContainer.innerHTML = "";
+      giftLottiePlayer = null;
+
+      const lottieUrl = buildLottieUrlFromGift(gift);
+
+      if (lottieUrl) {
+        const player = document.createElement("lottie-player");
+        player.setAttribute("src", lottieUrl);
+        player.setAttribute("autoplay", "");
+        player.setAttribute("loop", "false");
+        player.style.width = "100%";
+        player.style.height = "100%";
+        giftImageContainer.appendChild(player);
+        giftLottiePlayer = player;
+
+        giftImageContainer.onclick = () => {
+          if (giftLottiePlayer) {
+            giftLottiePlayer.stop();
+            giftLottiePlayer.play();
+          }
+        };
+        return;
+      }
+
+      if (gift.image_url || gift.lottie_url) {
+        const img = document.createElement("img");
+        img.src = gift.image_url || gift.lottie_url;
+        img.alt = gift.collection || "Подарок";
+        giftImageContainer.appendChild(img);
+      }
+    }
+
+    function rarityLabelFromPerMille(r) {
+      if (r == null) return "";
+      const percent = r / 10;
+      if (Math.abs(percent - Math.round(percent)) < 0.05) {
+        return Math.round(percent).toString().replace(".", ",") + "%";
+      }
+      return percent.toFixed(1).replace(".", ",") + "%";
+    }
+
+    function formatRarityForSubtitle(r) {
+      if (r == null) return "";
+      return "Редкость " + rarityLabelFromPerMille(r);
+    }
+
+    function findRarity(list, name) {
+      if (!list || !name) return null;
+      const item = list.find((x) => x && x.name === name);
+      if (!item) return null;
+      return item.rarity_per_mille ?? item.rarity ?? null;
+    }
+
+    async function populateGiftTraits(gift) {
+      giftTraitsContainer.innerHTML = "";
+      if (!gift) return;
+
+      const collectionName = gift.collection;
+      const attrs = await ensureAttributes(collectionName);
+
+      const traits = [];
+
+      const modelName = gift.model && gift.model.name;
+      if (modelName) {
+        const rarity = attrs ? findRarity(attrs.models, modelName) : null;
+        traits.push({ label: "Модель", name: modelName, rarity });
+      }
+
+      const symbolName =
+        (gift.symbol && gift.symbol.name) ||
+        gift.symbol ||
+        (gift.attributes && (gift.attributes.symbol || gift.attributes.Symbol));
+      if (symbolName) {
+        const symbolList = attrs && (attrs.symbols || attrs.symbol || attrs.symbol_list);
+        const rarity = symbolList ? findRarity(symbolList, symbolName) : null;
+        traits.push({ label: "Символ", name: symbolName, rarity });
+      }
+
+      const backdropName = gift.backdrop && gift.backdrop.name;
+      if (backdropName) {
+        const rarity = attrs ? findRarity(attrs.backdrops, backdropName) : null;
+        traits.push({ label: "Фон", name: backdropName, rarity });
+      }
+
+      if (!traits.length) {
+        const row = document.createElement("div");
+        row.className = "gift-row";
+        row.textContent = "Нет данных о редкости.";
+        giftTraitsContainer.appendChild(row);
+        return;
+      }
+
+      traits.forEach((t) => {
+        const row = document.createElement("div");
+        row.className = "gift-row";
+
+        const labelDiv = document.createElement("div");
+        labelDiv.className = "gift-row-label";
+        labelDiv.textContent = t.label;
+
+        const valueDiv = document.createElement("div");
+        valueDiv.className = "gift-row-value";
+
+        const nameSpan = document.createElement("span");
+        nameSpan.className = "gift-trait-name";
+        nameSpan.textContent = t.name;
+        valueDiv.appendChild(nameSpan);
+
+        const rarityText = t.rarity != null ? rarityLabelFromPerMille(t.rarity) : "";
+        if (rarityText) {
+          const raritySpan = document.createElement("span");
+          raritySpan.className = "gift-trait-rarity";
+          raritySpan.textContent = rarityText;
+          valueDiv.appendChild(raritySpan);
+        }
+
+        row.appendChild(labelDiv);
+        row.appendChild(valueDiv);
+        giftTraitsContainer.appendChild(row);
+      });
+    }
+
+    function openGiftSheet(gift) {
+      currentGift = gift;
+      setupGiftVisual(gift);
+      giftTitle.textContent =
+        gift.collection || (gift.model && gift.model.name) || "Подарок";
+      giftId.textContent = "#" + (gift.number ?? "????");
+
+      const priceRub = nanotonsToRub(gift.price);
+      giftBuyButton.textContent =
+        priceRub != null ? "Купить за " + formatRub(priceRub) : "Нет цены";
+
+      populateGiftTraits(gift);
+      giftOverlay.style.display = "flex";
+    }
+
+    function closeGiftSheet() {
+      giftOverlay.style.display = "none";
+      currentGift = null;
+      giftImageContainer.innerHTML = "";
+      giftImageContainer.onclick = null;
+      giftLottiePlayer = null;
+    }
+
+    async function fetchCollections() {
+      setStatus("Подарки отсортированы по цене (сначала дешёвые). Загрузка коллекций…", true);
+      try {
+        const res = await fetch(API_BASE + "/collections");
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+        collectionsCache = (data || []).sort((a, b) => a.name.localeCompare(b.name));
+
+        globalCollectionStats.clear();
+        for (const col of collectionsCache) {
+          const floorRub =
+            col.stats && col.stats.floor != null
+              ? nanotonsToRub(col.stats.floor)
+              : null;
+          globalCollectionStats.set(col.name, { floorRub });
+          if (col.image_url && !collectionPreviewImages.has(col.name)) {
+            collectionPreviewImages.set(col.name, col.image_url);
+          }
+        }
+
+        buildCollectionModalItems();
+      } catch (err) {
+        console.error(err);
+        setStatus("Ошибка загрузки коллекций: " + err.message);
+      }
+    }
+
+    async function fetchAttributesForCollections(names) {
+      if (!names.length) return;
+      try {
+        const res = await fetch(API_BASE + "/attributes", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ collections: names })
+        });
+        if (!res.ok) {
+          let t = "";
+          try {
+            t = await res.text();
+          } catch (_) {}
+          throw new Error("HTTP " + res.status + (t ? " – " + t : ""));
+        }
+        const json = await res.json();
+        if (!json) return;
+        for (const name of names) {
+          if (json[name]) {
+            attributesCache[name] = json[name];
+            const models = (json[name].models || [])
+              .map((m) => m.name)
+              .filter(Boolean);
+            if (models.length && !collectionPreviewImages.has(name)) {
+              const idx = Math.floor(Math.random() * models.length);
+              const mName = models[idx];
+              collectionPreviewImages.set(name, modelPngUrl(name, mName));
+            }
+          }
+        }
+      } catch (err) {
+        console.error("attributes error", err);
+      }
+    }
+
+    async function ensureAttributes(collectionName) {
+      if (!collectionName) return null;
+      if (attributesCache[collectionName]) return attributesCache[collectionName];
+      await fetchAttributesForCollections([collectionName]);
+      return attributesCache[collectionName] || null;
+    }
+
+    async function prefetchAttributesForAllCollections() {
+      const names = collectionsCache.map((c) => c.name);
+      const chunkSize = 20;
+      for (let i = 0; i < names.length; i += chunkSize) {
+        const chunk = names.slice(i, i + chunkSize);
+        await fetchAttributesForCollections(chunk);
+      }
+      buildCollectionModalItems();
+    }
+
+    function buildCollectionModalItems() {
+      const items = collectionsCache.map((col) => {
+        const stats = globalCollectionStats.get(col.name);
+        return {
+          id: col.name,
+          label: col.name,
+          subtitle: "",
+          priceRub: stats ? stats.floorRub : null,
+          imageUrl: collectionPreviewImages.get(col.name) || null
+        };
+      });
+      modalState.data.collection.items = items;
+    }
+
+    function buildSearchBody() {
+      const body = { ordering: "PRICE_ASC" };
+      if (selectedCollections.length) body.collections = selectedCollections.slice();
+      if (selectedModels.length) body.models = Array.from(new Set(selectedModels));
+      if (selectedBackdrops.length) body.backdrops = Array.from(new Set(selectedBackdrops));
+      return body;
+    }
+
+    function clearResults() {
+      resultsGrid.innerHTML = "";
+      resultsGrid.style.display = "none";
+      emptyState.style.display = "block";
+    }
+
+    function renderResults(items) {
+      if (!items || !items.length) {
+        return;
+      }
+      resultsGrid.style.display = "grid";
+      emptyState.style.display = "none";
+
+      for (const gift of items) {
+        const card = document.createElement("div");
+        card.className = "card";
+
+        const imgWrap = document.createElement("div");
+        imgWrap.className = "card-image-wrapper";
+        if (gift.image_url || gift.lottie_url) {
+          const img = document.createElement("img");
+          img.src = gift.image_url || gift.lottie_url;
+          img.alt = gift.collection || "Подарок";
+          img.loading = "lazy";
+          imgWrap.appendChild(img);
+        }
+        card.appendChild(imgWrap);
+
+        const title = document.createElement("div");
+        title.className = "card-title";
+        title.textContent =
+          (gift.model && gift.model.name) || gift.collection || "Подарок";
+        card.appendChild(title);
+
+        const subtitle = document.createElement("div");
+        subtitle.className = "card-subtitle";
+        subtitle.textContent = "#" + (gift.number ?? "????");
+        card.appendChild(subtitle);
+
+        const priceRow = document.createElement("div");
+        priceRow.className = "price-row";
+        const pill = document.createElement("div");
+        pill.className = "price-pill";
+
+        const price = document.createElement("div");
+        price.className = "price-value";
+        const priceRub = nanotonsToRub(gift.price);
+        price.textContent = formatRub(priceRub);
+
+        pill.appendChild(price);
+        priceRow.appendChild(pill);
+        card.appendChild(priceRow);
+
+        // hover-анимка с задержкой 0.6 секунды
+        let hoverTimeout = null;
+        let hoverPlayer = null;
+
+        card.addEventListener("mouseenter", () => {
+          if (hoverTimeout) clearTimeout(hoverTimeout);
+          hoverTimeout = setTimeout(() => {
+            const lottieUrl = buildLottieUrlFromGift(gift);
+            if (!lottieUrl) return;
+            if (hoverPlayer) {
+              hoverPlayer.remove();
+              hoverPlayer = null;
+            }
+            const player = document.createElement("lottie-player");
+            player.setAttribute("src", lottieUrl);
+            player.setAttribute("autoplay", "");
+            player.setAttribute("loop", "false");
+            player.style.position = "absolute";
+            player.style.inset = "0";
+            player.style.pointerEvents = "none";
+            imgWrap.appendChild(player);
+            hoverPlayer = player;
+          }, 600);
+        });
+
+        card.addEventListener("mouseleave", () => {
+          if (hoverTimeout) {
+            clearTimeout(hoverTimeout);
+            hoverTimeout = null;
+          }
+          if (hoverPlayer) {
+            hoverPlayer.remove();
+            hoverPlayer = null;
+          }
+        });
+
+        card.addEventListener("click", () => openGiftSheet(gift));
+        resultsGrid.appendChild(card);
+      }
+    }
+
+    function renderNextChunk() {
+      if (!lastGifts || renderedCount >= lastGifts.length) return;
+      const slice = lastGifts.slice(renderedCount, renderedCount + LOCAL_PAGE_SIZE);
+      renderedCount += slice.length;
+      renderResults(slice);
+    }
+
+    async function fetchGiftsPage(page) {
+      const body = currentSearchBody || buildSearchBody();
+      const url = API_BASE + "/gifts?page=" + page + "&per_page=" + SERVER_PAGE_SIZE;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      if (!res.ok) {
+        let t = "";
+        try {
+          t = await res.text();
+        } catch (_) {}
+        throw new Error("HTTP " + res.status + (t ? " – " + t : ""));
+      }
+      const data = await res.json();
+      let items = (data && Array.isArray(data.items)) ? data.items : [];
+      items = items.filter(isOffchainGift);
+      if (!items.length) {
+        serverHasMore = false;
+        return;
+      }
+      lastGifts = lastGifts.concat(items);
+
+      for (const gift of items) {
+        const col = gift.collection || "Unknown";
+        const priceRub = nanotonsToRub(gift.price);
+        let entry = globalCollectionStats.get(col);
+        if (!entry) {
+          entry = { floorRub: null };
+          globalCollectionStats.set(col, entry);
+        }
+        if (
+          priceRub != null &&
+          (entry.floorRub == null || priceRub < entry.floorRub)
+        ) {
+          entry.floorRub = priceRub;
+        }
+      }
+      serverHasMore = items.length === SERVER_PAGE_SIZE;
+      buildCollectionModalItems();
+    }
+
+    async function searchGifts() {
+      lastGifts = [];
+      renderedCount = 0;
+      serverPage = 1;
+      serverHasMore = true;
+      resultsGrid.innerHTML = "";
+      resultsGrid.scrollTop = 0;
+      resultsGrid.style.display = "grid";
+      emptyState.style.display = "none";
+
+      currentSearchBody = buildSearchBody();
+
+      setStatus("Загрузка подарков…", true);
+      try {
+        await fetchGiftsPage(serverPage);
+        serverPage += 1;
+
+        if (!lastGifts.length) {
+          clearResults();
+          setStatus("Подарки не найдены для этих фильтров.");
+        } else {
+          renderNextChunk();
+          setStatus("Подарки отсортированы по цене (сначала дешёвые).");
+        }
+      } catch (err) {
+        console.error(err);
+        clearResults();
+        setStatus("Ошибка загрузки подарков: " + err.message);
+      }
+    }
+
+    async function maybeLoadMore() {
+      if (isLoadingMore) return;
+      const threshold = 120;
+      if (
+        resultsGrid.scrollTop + resultsGrid.clientHeight >=
+        resultsGrid.scrollHeight - threshold
+      ) {
+        if (renderedCount < lastGifts.length) {
+          renderNextChunk();
+        } else if (serverHasMore) {
+          isLoadingMore = true;
+          try {
+            await fetchGiftsPage(serverPage);
+            serverPage += 1;
+            renderNextChunk();
+          } catch (err) {
+            console.error(err);
+          } finally {
+            isLoadingMore = false;
+          }
+        }
+      }
+    }
+
+    async function updateModelAndBackdropModalDataFromAttributes() {
+      const colNames = selectedCollections.slice();
+      if (!colNames.length) {
+        modalState.data.model.items = [];
+        modalState.data.backdrop.items = [];
+        return;
+      }
+
+      const toFetch = colNames.filter((n) => !attributesCache[n]);
+      if (toFetch.length) await fetchAttributesForCollections(toFetch);
+
+      const modelItems = [];
+      const backdropItems = [];
+
+      const sortedCols = colNames.slice().sort((a, b) => a.localeCompare(b));
+
+      for (const collectionName of sortedCols) {
+        const attrs = attributesCache[collectionName];
+        if (!attrs) continue;
+
+        if (Array.isArray(attrs.models)) {
+          for (const m of attrs.models) {
+            const rarity = m.rarity_per_mille ?? m.rarity ?? null;
+            const priceRub =
+              m.stats && m.stats.floor != null
+                ? nanotonsToRub(m.stats.floor)
+                : null;
+            modelItems.push({
+              id: m.name,
+              label: m.name,
+              collection: collectionName,
+              rarityValue: rarity,
+              subtitle: formatRarityForSubtitle(rarity),
+              priceRub,
+              imageUrl: m.image_url || modelPngUrl(collectionName, m.name)
+            });
+          }
+        }
+
+        if (Array.isArray(attrs.backdrops)) {
+          for (const b of attrs.backdrops) {
+            const rarity = b.rarity_per_mille ?? b.rarity ?? null;
+            const priceRub =
+              b.stats && b.stats.floor != null
+                ? nanotonsToRub(b.stats.floor)
+                : null;
+            const centerHex = colorIntToHex(b.center_color);
+            backdropItems.push({
+              id: b.name,
+              label: b.name,
+              collection: collectionName,
+              rarityValue: rarity,
+              subtitle: formatRarityForSubtitle(rarity),
+              priceRub,
+              color: centerHex || guessColorFromName(b.name)
+            });
+          }
+        }
+      }
+
+      modelItems.sort((a, b) => {
+        if (a.collection !== b.collection) {
+          return a.collection.localeCompare(b.collection);
+        }
+        const ar = a.rarityValue ?? Number.POSITIVE_INFINITY;
+        const br = b.rarityValue ?? Number.POSITIVE_INFINITY;
+        if (ar !== br) return ar - br;
+        return a.label.localeCompare(b.label);
+      });
+
+      backdropItems.sort((a, b) => {
+        if (a.collection !== b.collection) {
+          return a.collection.localeCompare(b.collection);
+        }
+        const ar = a.rarityValue ?? Number.POSITIVE_INFINITY;
+        const br = b.rarityValue ?? Number.POSITIVE_INFINITY;
+        if (ar !== br) return ar - br;
+        return a.label.localeCompare(b.label);
+      });
+
+      modalState.data.model.items = modelItems;
+      modalState.data.backdrop.items = backdropItems;
+
+      if (modalState.current === "model" || modalState.current === "backdrop") {
+        renderModalList();
+      }
+    }
+
+    function updateFilterLabel(el, selectedArray) {
+      if (!selectedArray.length) {
+        el.textContent = "Все";
+      } else if (selectedArray.length === 1) {
+        el.textContent = selectedArray[0];
+      } else {
+        el.textContent = selectedArray[0] + " +" + (selectedArray.length - 1);
+      }
+    }
+
+    function openModal(kind) {
+      modalState.current = kind;
+      modalState.searchTerm = "";
+      modalSearch.value = "";
+      modalEmpty.style.display = "none";
+
+      if (kind === "collection") {
+        modalTitle.textContent = "Коллекции";
+        modalSearch.placeholder = "Поиск по коллекции";
+        modalState.data.collection.selected = new Set(selectedCollections);
+      } else if (kind === "model") {
+        modalTitle.textContent = "Модели";
+        modalSearch.placeholder = "Поиск по модели";
+        modalState.data.model.selected = new Set(selectedModels);
+      } else if (kind === "backdrop") {
+        modalTitle.textContent = "Фоны";
+        modalSearch.placeholder = "Поиск по фону";
+        modalState.data.backdrop.selected = new Set(selectedBackdrops);
+      }
+
+      renderModalList();
+      modalOverlay.style.display = "flex";
+    }
+
+    function closeModal(applySelection = false) {
+      if (applySelection) {
+        applyModalSelection();
+      }
+      modalOverlay.style.display = "none";
+    }
+
+    function applyModalSelection() {
+      const current = modalState.current;
+      if (!current) return;
+      const state = modalState.data[current];
+      const selected = Array.from(state.selected);
+
+      if (current === "collection") {
+        selectedCollections = selected;
+        updateFilterLabel(collectionValue, selectedCollections);
+        updateModelAndBackdropModalDataFromAttributes().then(() => {
+          searchGifts();
+        });
+        return;
+      } else if (current === "model") {
+        selectedModels = selected;
+        updateFilterLabel(modelValue, selectedModels);
+      } else if (current === "backdrop") {
+        selectedBackdrops = selected;
+        updateFilterLabel(backdropValue, selectedBackdrops);
+      }
+
+      searchGifts();
+    }
+
+    function renderModalList() {
+      const current = modalState.current;
+      if (!current) return;
+      const state = modalState.data[current];
+      const items = state.items || [];
+      const term = modalState.searchTerm.toLowerCase();
+
+      modalList.innerHTML = "";
+
+      let filtered = term
+        ? items.filter((i) => i.label.toLowerCase().includes(term))
+        : items;
+
+      filtered = filtered.slice().sort((a, b) => {
+        const aSel = state.selected.has(a.id) ? 0 : 1;
+        const bSel = state.selected.has(b.id) ? 0 : 1;
+        if (aSel !== bSel) return aSel - bSel;
+
+        const ar = a.rarityValue ?? Number.POSITIVE_INFINITY;
+        const br = b.rarityValue ?? Number.POSITIVE_INFINITY;
+        if (ar !== br) return ar - br;
+
+        if (a.collection !== b.collection) {
+          return (a.collection || "").localeCompare(b.collection || "");
+        }
+        return a.label.localeCompare(b.label);
+      });
+
+      if (!filtered.length) {
+        modalEmpty.style.display = "block";
+        return;
+      }
+      modalEmpty.style.display = "none";
+
+      filtered.forEach((item) => {
+        const li = document.createElement("li");
+        li.className = "modal-row" + (state.selected.has(item.id) ? " selected" : "");
+
+        function toggleSelection() {
+          if (state.selected.has(item.id)) {
+            state.selected.delete(item.id);
+          } else {
+            state.selected.add(item.id);
+          }
+          renderModalList();
+        }
+
+        li.addEventListener("click", () => {
+          toggleSelection();
+        });
+
+        const check = document.createElement("div");
+        check.className =
+          "modal-check" + (state.selected.has(item.id) ? " selected" : "");
+        check.addEventListener("click", (ev) => {
+          ev.stopPropagation();
+          toggleSelection();
+        });
+        if (state.selected.has(item.id)) {
+          const inner = document.createElement("div");
+          inner.className = "modal-check-inner";
+          check.appendChild(inner);
+        }
+        li.appendChild(check);
+
+        if (current === "backdrop") {
+          const circle = document.createElement("div");
+          circle.className = "modal-thumb-circle";
+          circle.style.background = item.color || "#4b5563";
+          li.appendChild(circle);
+        } else {
+          const thumb = document.createElement("div");
+          thumb.className = "modal-thumb";
+          if (item.imageUrl) {
+            const img = document.createElement("img");
+            img.src = item.imageUrl;
+            img.alt = item.label;
+            img.loading = "lazy";
+            thumb.appendChild(img);
+          }
+          li.appendChild(thumb);
+        }
+
+        const main = document.createElement("div");
+        main.className = "modal-main";
+        const t = document.createElement("div");
+        t.className = "modal-main-title";
+        t.textContent = item.label;
+        main.appendChild(t);
+        if (item.subtitle) {
+          const sub = document.createElement("div");
+          sub.className = "modal-main-sub";
+          sub.textContent = item.subtitle;
+          main.appendChild(sub);
+        }
+        li.appendChild(main);
+
+        const priceBlock = document.createElement("div");
+        priceBlock.className = "modal-price-block";
+
+        const priceRow = document.createElement("div");
+        priceRow.className = "modal-price-row";
+        const priceVal = document.createElement("div");
+        priceVal.className = "modal-price-value";
+        priceVal.textContent =
+          item.priceRub != null ? formatRub(item.priceRub) : "—";
+        priceRow.appendChild(priceVal);
+
+        const priceLabel = document.createElement("div");
+        priceLabel.className = "modal-price-label";
+        priceLabel.textContent = "МИНИМАЛЬНАЯ ЦЕНА";
+
+        priceBlock.appendChild(priceRow);
+        priceBlock.appendChild(priceLabel);
+        li.appendChild(priceBlock);
+
+        modalList.appendChild(li);
+      });
+    }
+
+    modalSearch.addEventListener("input", (e) => {
+      modalState.searchTerm = e.target.value || "";
+      renderModalList();
+    });
+
+    modalCloseX.addEventListener("click", () => {
+      closeModal(true);
+    });
+
+    modalCloseBtn.addEventListener("click", () => {
+      closeModal(true);
+    });
+
+    modalClearBtn.addEventListener("click", () => {
+      const current = modalState.current;
+      if (!current) return;
+      const state = modalState.data[current];
+      state.selected.clear();
+      applyModalSelection();
+      modalOverlay.style.display = "none";
+    });
+
+    giftClose.addEventListener("click", () => {
+      closeGiftSheet();
+    });
+
+    giftOverlay.addEventListener("click", (e) => {
+      if (e.target === giftOverlay) {
+        closeGiftSheet();
+      }
+    });
+
+    pillCollection.addEventListener("click", () => {
+      openModal("collection");
+    });
+
+    pillModel.addEventListener("click", () => {
+      updateModelAndBackdropModalDataFromAttributes().then(() => {
+        openModal("model");
+      });
+    });
+
+    pillBackdrop.addEventListener("click", () => {
+      updateModelAndBackdropModalDataFromAttributes().then(() => {
+        openModal("backdrop");
+      });
+    });
+
+    resultsGrid.addEventListener("scroll", () => {
+      maybeLoadMore();
+    });
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      await fetchCollections();
+      await searchGifts();
+      await prefetchAttributesForAllCollections();
+    });
+  </script>
+</body>
+</html>
