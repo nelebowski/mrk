@@ -847,7 +847,7 @@
     let renderedCount = 0;
     const LOCAL_PAGE_SIZE = 24;
     const SERVER_PAGE_SIZE = 60;
-    let serverPage = 1;
+    let serverPage = { page: 1, token: null };
     let serverHasMore = true;
     let isLoadingMore = false;
     let currentSearchBody = null;
@@ -1356,18 +1356,43 @@
       requestAnimationFrame(() => maybeLoadMore());
     }
 
-    async function fetchGiftsPage(page) {
+    async function fetchGiftsPage(pageHint) {
         const searchBody = currentSearchBody || buildSearchBody();
         const body = { ...searchBody, per_page: SERVER_PAGE_SIZE };
 
-        let url = API_BASE + "/gifts?per_page=" + SERVER_PAGE_SIZE;
-        if (typeof page === "number") {
-          url += "&page=" + page;
-          body.page = page;
-        } else if (page != null) {
-          url += "&page_token=" + encodeURIComponent(page);
-          body.page_token = page;
+        const normalizedPageNumber =
+          pageHint && typeof pageHint === "object"
+            ? typeof pageHint.page === "number"
+              ? pageHint.page
+              : typeof pageHint.page === "string"
+                ? Number.parseInt(pageHint.page, 10)
+                : null
+            : typeof pageHint === "number"
+              ? pageHint
+              : null;
+
+        const normalizedPage = {
+          page: Number.isNaN(normalizedPageNumber) ? null : normalizedPageNumber,
+          token:
+            pageHint && typeof pageHint === "object"
+              ? pageHint.token ?? null
+              : typeof pageHint === "string"
+                ? pageHint
+                : null,
+        };
+
+        const params = new URLSearchParams();
+        params.set("per_page", SERVER_PAGE_SIZE);
+        if (normalizedPage.page != null) {
+          params.set("page", normalizedPage.page);
+          body.page = normalizedPage.page;
         }
+        if (normalizedPage.token != null) {
+          params.set("page_token", normalizedPage.token);
+          body.page_token = normalizedPage.token;
+        }
+
+        const url = API_BASE + "/gifts?" + params.toString();
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1390,32 +1415,39 @@
       const metaNextToken = meta && meta.next_page_token != null ? meta.next_page_token : null;
       const metaPage = meta && typeof meta.page === "number" ? meta.page : null;
 
-      let nextPage = null;
-      if (metaNextToken != null) {
-        nextPage = metaNextToken;
-      } else if (metaNextPage != null) {
-        nextPage = metaNextPage;
-      } else if (metaPage != null && hasMoreFromMeta !== false) {
-        nextPage = metaPage + 1;
-      } else if (typeof page === "number" && hasMoreFromMeta !== false) {
-        nextPage = page + 1;
-      }
+        const nextPageHint = { page: null, token: null };
+        if (metaNextToken != null) {
+          nextPageHint.token = metaNextToken;
+        }
+        if (metaNextPage != null) {
+          nextPageHint.page = metaNextPage;
+        } else if (metaPage != null && hasMoreFromMeta !== false) {
+          nextPageHint.page = metaPage + 1;
+        } else if (normalizedPage.page != null && hasMoreFromMeta !== false) {
+          nextPageHint.page = normalizedPage.page + 1;
+        }
 
-      if (nextPage === page && nextPage != null) {
-        nextPage = null;
-      }
+        const samePageHint =
+          (nextPageHint.page != null || nextPageHint.token != null) &&
+          nextPageHint.page === normalizedPage.page &&
+          nextPageHint.token === normalizedPage.token;
+        const nextPage = samePageHint
+          ? null
+          : nextPageHint.page != null || nextPageHint.token != null
+            ? nextPageHint
+            : null;
 
-      if (hasMoreFromMeta === false) {
-        serverHasMore = false;
-      } else if (hasMoreFromMeta === true) {
-        serverHasMore = nextPage != null;
-      } else if (metaNextPage != null || metaNextToken != null) {
-        serverHasMore = nextPage != null;
-      } else if (typeof page === "number") {
-        serverHasMore = items.length === SERVER_PAGE_SIZE && nextPage != null;
-      } else {
-        serverHasMore = false;
-      }
+        if (hasMoreFromMeta === false) {
+          serverHasMore = false;
+        } else if (hasMoreFromMeta === true) {
+          serverHasMore = nextPage != null;
+        } else if (metaNextPage != null || metaNextToken != null) {
+          serverHasMore = nextPage != null;
+        } else if (normalizedPage.page != null) {
+          serverHasMore = items.length === SERVER_PAGE_SIZE && nextPage != null;
+        } else {
+          serverHasMore = false;
+        }
 
       // Если на этой странице для нас нет подходящих подарков,
       // всё равно обновляем флаг serverHasMore по данным бэка
@@ -1450,7 +1482,7 @@
     async function searchGifts() {
       lastGifts = [];
       renderedCount = 0;
-      serverPage = 1;
+      serverPage = { page: 1, token: null };
       serverHasMore = true;
       resultsGrid.innerHTML = "";
       resultsGrid.scrollTop = 0;
