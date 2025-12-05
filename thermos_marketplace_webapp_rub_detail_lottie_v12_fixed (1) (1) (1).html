@@ -1357,8 +1357,15 @@
     }
 
     async function fetchGiftsPage(page) {
-      const body = currentSearchBody || buildSearchBody();
-      const url = API_BASE + "/gifts?page=" + page + "&per_page=" + SERVER_PAGE_SIZE;
+      const searchBody = currentSearchBody || buildSearchBody();
+      const body = { ...searchBody };
+
+      let url = API_BASE + "/gifts?per_page=" + SERVER_PAGE_SIZE;
+      if (typeof page === "number") {
+        url += "&page=" + page;
+      } else if (page != null) {
+        url += "&page_token=" + encodeURIComponent(page);
+      }
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1376,18 +1383,28 @@
       let items = (data && Array.isArray(data.items)) ? data.items : [];
       const filtered = items.filter(isOffchainGift);
 
+      if (meta && typeof meta.has_more === "boolean") {
+        serverHasMore = meta.has_more;
+      } else {
+        serverHasMore = items.length > 0;
+      }
+
+      let nextPage = typeof page === "number" ? page + 1 : page;
+      if (meta) {
+        if (meta.next_page != null) {
+          nextPage = meta.next_page;
+        } else if (meta.next_page_token != null) {
+          nextPage = meta.next_page_token;
+        } else if (meta.page != null && typeof meta.page === "number") {
+          nextPage = meta.page + 1;
+        }
+      }
+
       // Если на этой странице для нас нет подходящих подарков,
       // всё равно обновляем флаг serverHasMore по данным бэка
-      // и просто не добавляем ничего в список.
+      // и возвращаем nextPage, чтобы цикл мог продолжиться.
       if (!filtered.length) {
-        if (meta && typeof meta.has_more === "boolean") {
-          serverHasMore = meta.has_more;
-        } else {
-          // Без meta считаем, что, пока бэк возвращает хоть какие-то items,
-          // можно пробовать следующую страницу.
-          serverHasMore = items.length > 0;
-        }
-        return;
+        return { nextPage };
       }
 
       lastGifts = lastGifts.concat(filtered);
@@ -1408,13 +1425,9 @@
         }
       }
 
-      if (meta && typeof meta.has_more === "boolean") {
-        serverHasMore = meta.has_more;
-      } else {
-        serverHasMore = items.length > 0;
-      }
-
       buildCollectionModalItems();
+
+      return { nextPage };
     }
 
     async function searchGifts() {
@@ -1431,8 +1444,8 @@
 
       setStatus("Загрузка подарков…", true);
       try {
-        await fetchGiftsPage(serverPage);
-        serverPage += 1;
+        const { nextPage } = await fetchGiftsPage(serverPage);
+        serverPage = nextPage;
 
         if (!lastGifts.length) {
           clearResults();
@@ -1460,8 +1473,8 @@
         } else if (serverHasMore) {
           isLoadingMore = true;
           try {
-            await fetchGiftsPage(serverPage);
-            serverPage += 1;
+            const { nextPage } = await fetchGiftsPage(serverPage);
+            serverPage = nextPage;
             renderNextChunk();
           } catch (err) {
             console.error(err);
