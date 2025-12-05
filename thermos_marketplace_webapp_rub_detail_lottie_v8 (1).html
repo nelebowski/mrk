@@ -178,6 +178,12 @@
       scrollbar-color: #333333 transparent;
     }
 
+    .scroll-sentinel {
+      height: 1px;
+      width: 100%;
+      pointer-events: none;
+    }
+
     .grid::-webkit-scrollbar {
       width: 6px;
     }
@@ -739,13 +745,13 @@
     </div>
 
     <div class="status-row">
-      <div class="status-text" id="status-text">
-        Подарки отсортированы по цене (сначала дешёвые).
-      </div>
+      <div class="status-text" id="status-text"></div>
       <button class="reset-button" id="reset-filters" style="display:none;">Сбросить</button>
     </div>
 
-    <div id="results" class="grid"></div>
+    <div id="results" class="grid">
+      <div id="scroll-sentinel" class="scroll-sentinel"></div>
+    </div>
     <div id="empty" class="empty" style="display:none;">
       Нет результатов. Попробуйте изменить фильтры выше.
     </div>
@@ -807,6 +813,7 @@
     const statusText = document.getElementById("status-text");
     const resultsGrid = document.getElementById("results");
     const emptyState = document.getElementById("empty");
+    const scrollSentinel = document.getElementById("scroll-sentinel");
 
     const pillCollection = document.getElementById("pill-collection");
     const pillModel = document.getElementById("pill-model");
@@ -868,6 +875,16 @@
         backdrop: { items: [], selected: new Set() }
       }
     };
+
+    const sentinelObserver = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          maybeLoadMore();
+        }
+      },
+      { root: resultsGrid, rootMargin: "200px 0px 240px" }
+    );
+    sentinelObserver.observe(scrollSentinel);
 
     function setStatus(text, isLoading = false) {
       lastStatusMessage = text;
@@ -1144,7 +1161,7 @@
     }
 
     async function fetchCollections() {
-      setStatus("Подарки отсортированы по цене (сначала дешёвые). Загрузка коллекций…", true);
+      setStatus("Загрузка коллекций…", true);
       try {
         const res = await fetch(API_BASE + "/collections");
         if (!res.ok) throw new Error("HTTP " + res.status);
@@ -1244,8 +1261,15 @@
       return body;
     }
 
+    function ensureSentinel() {
+      if (!resultsGrid.contains(scrollSentinel)) {
+        resultsGrid.appendChild(scrollSentinel);
+      }
+    }
+
     function clearResults() {
       resultsGrid.innerHTML = "";
+      ensureSentinel();
       resultsGrid.style.display = "none";
       emptyState.style.display = "block";
     }
@@ -1256,6 +1280,7 @@
       }
       resultsGrid.style.display = "grid";
       emptyState.style.display = "none";
+      ensureSentinel();
 
       for (const gift of items) {
         const card = document.createElement("div");
@@ -1334,7 +1359,7 @@
         });
 
         card.addEventListener("click", () => openGiftSheet(gift));
-        resultsGrid.appendChild(card);
+        resultsGrid.insertBefore(card, scrollSentinel);
       }
     }
 
@@ -1394,6 +1419,7 @@
       serverPage = 1;
       serverHasMore = true;
       resultsGrid.innerHTML = "";
+      ensureSentinel();
       resultsGrid.scrollTop = 0;
       resultsGrid.style.display = "grid";
       emptyState.style.display = "none";
