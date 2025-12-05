@@ -5,6 +5,8 @@
   <title>Thermos Gifts – NFT маркетплейс</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
+    @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
     :root {
       --bg-page: #111111;
       --bg-phone: #141414;
@@ -38,7 +40,7 @@
     }
 
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
       background: radial-gradient(circle at top, #1e1e1e 0, #111111 55%, #050505 100%);
       color: var(--text-primary);
       display: flex;
@@ -126,6 +128,13 @@
       opacity: 0.9;
     }
 
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 24px;
+    }
+
     .status-text {
       font-size: 12px;
       color: var(--text-secondary);
@@ -133,8 +142,26 @@
       flex-shrink: 0;
     }
 
-    .status-text strong {
+    .reset-button {
+      padding: 7px 12px;
+      background: #2b2b2b;
       color: var(--text-primary);
+      border: 1px solid var(--border-soft);
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+      transition: background 0.15s ease, transform 0.15s ease;
+    }
+
+    .reset-button:hover {
+      background: #323232;
+      transform: translateY(-1px);
+    }
+
+    .reset-button:active {
+      transform: translateY(0);
     }
 
     .grid {
@@ -711,8 +738,11 @@
       </div>
     </div>
 
-    <div class="status-text" id="status-text">
-      <strong>Готово.</strong> Подарки отсортированы по цене (сначала дешёвые).
+    <div class="status-row">
+      <div class="status-text" id="status-text">
+        Подарки отсортированы по цене (сначала дешёвые).
+      </div>
+      <button class="reset-button" id="reset-filters" style="display:none;">Сбросить</button>
     </div>
 
     <div id="results" class="grid"></div>
@@ -785,6 +815,7 @@
     const collectionValue = document.getElementById("collection-value");
     const modelValue = document.getElementById("model-value");
     const backdropValue = document.getElementById("backdrop-value");
+    const resetButton = document.getElementById("reset-filters");
 
     const modalOverlay = document.getElementById("modal-overlay");
     const modalTitle = document.getElementById("modal-title");
@@ -805,6 +836,10 @@
 
     let giftLottiePlayer = null;
     let currentGift = null;
+
+    const READY_STATUS_TEXT = "";
+    let lastStatusMessage = READY_STATUS_TEXT;
+    let lastStatusLoading = false;
 
     let collectionsCache = [];
     let attributesCache = {};
@@ -835,7 +870,19 @@
     };
 
     function setStatus(text, isLoading = false) {
-      statusText.textContent = (isLoading ? "Загрузка… " : "") + text;
+      lastStatusMessage = text;
+      lastStatusLoading = isLoading;
+      statusText.textContent = text ? (isLoading ? "Загрузка… " + text : text) : "";
+      updateStatusArea();
+    }
+
+    function updateStatusArea() {
+      const hasCollection = selectedCollections.length > 0;
+      const isReadyMessage = lastStatusMessage === READY_STATUS_TEXT || !lastStatusMessage;
+      const shouldHideStatus =
+        (hasCollection && isReadyMessage) || (!lastStatusMessage && !lastStatusLoading);
+      statusText.style.display = shouldHideStatus ? "none" : "block";
+      resetButton.style.display = hasCollection ? "inline-flex" : "none";
     }
 
     function fromNanotons(nanotons) {
@@ -1363,7 +1410,8 @@
           setStatus("Подарки не найдены для этих фильтров.");
         } else {
           renderNextChunk();
-          setStatus("Подарки отсортированы по цене (сначала дешёвые).");
+          await maybeLoadMore();
+          setStatus(READY_STATUS_TEXT);
         }
       } catch (err) {
         console.error(err);
@@ -1374,30 +1422,39 @@
 
     async function maybeLoadMore() {
       if (isLoadingMore) return;
-      const threshold = 120;
-      if (
+      const threshold = 160;
+      const closeToBottom =
         resultsGrid.scrollTop + resultsGrid.clientHeight >=
-        resultsGrid.scrollHeight - threshold
-      ) {
-        if (renderedCount < lastGifts.length) {
+          resultsGrid.scrollHeight - threshold ||
+        resultsGrid.scrollHeight <= resultsGrid.clientHeight + threshold;
+
+      if (!closeToBottom) return;
+
+      if (renderedCount < lastGifts.length) {
+        renderNextChunk();
+      } else if (serverHasMore) {
+        isLoadingMore = true;
+        try {
+          await fetchGiftsPage(serverPage);
+          serverPage += 1;
           renderNextChunk();
-        } else if (serverHasMore) {
-          isLoadingMore = true;
-          try {
-            await fetchGiftsPage(serverPage);
-            serverPage += 1;
-            renderNextChunk();
-          } catch (err) {
-            console.error(err);
-          } finally {
-            isLoadingMore = false;
-          }
+        } catch (err) {
+          console.error(err);
+        } finally {
+          isLoadingMore = false;
         }
+        await maybeLoadMore();
       }
     }
 
     async function updateModelAndBackdropModalDataFromAttributes() {
-      const colNames = selectedCollections.slice();
+      if (!collectionsCache.length) {
+        await fetchCollections();
+      }
+      const colNames = selectedCollections.length
+        ? selectedCollections.slice()
+        : collectionsCache.map((c) => c.name);
+
       if (!colNames.length) {
         modalState.data.model.items = [];
         modalState.data.backdrop.items = [];
@@ -1407,6 +1464,7 @@
       const toFetch = colNames.filter((n) => !attributesCache[n]);
       if (toFetch.length) await fetchAttributesForCollections(toFetch);
 
+      const allowModelItems = selectedCollections.length > 0;
       const modelItems = [];
       const backdropItems = [];
 
@@ -1416,7 +1474,7 @@
         const attrs = attributesCache[collectionName];
         if (!attrs) continue;
 
-        if (Array.isArray(attrs.models)) {
+        if (allowModelItems && Array.isArray(attrs.models)) {
           for (const m of attrs.models) {
             const rarity = m.rarity_per_mille ?? m.rarity ?? null;
             const priceRub =
@@ -1494,7 +1552,16 @@
       }
     }
 
-    function openModal(kind) {
+    function syncFilterPills() {
+      const hasCollection = selectedCollections.length > 0;
+      pillModel.classList.toggle("disabled", !hasCollection);
+      pillModel.setAttribute("aria-disabled", String(!hasCollection));
+    }
+
+    async function openModal(kind) {
+      if (!collectionsCache.length) {
+        await fetchCollections();
+      }
       modalState.current = kind;
       modalState.searchTerm = "";
       modalSearch.value = "";
@@ -1534,6 +1601,11 @@
       if (current === "collection") {
         selectedCollections = selected;
         updateFilterLabel(collectionValue, selectedCollections);
+        selectedModels = [];
+        updateFilterLabel(modelValue, selectedModels);
+        modalState.data.model.selected = new Set();
+        syncFilterPills();
+        updateStatusArea();
         updateModelAndBackdropModalDataFromAttributes().then(() => {
           searchGifts();
         });
@@ -1706,6 +1778,7 @@
     });
 
     pillModel.addEventListener("click", () => {
+      if (!selectedCollections.length) return;
       updateModelAndBackdropModalDataFromAttributes().then(() => {
         openModal("model");
       });
@@ -1717,9 +1790,28 @@
       });
     });
 
+    resetButton.addEventListener("click", () => {
+      selectedCollections = [];
+      selectedModels = [];
+      selectedBackdrops = [];
+      modalState.data.collection.selected = new Set();
+      modalState.data.model.selected = new Set();
+      modalState.data.backdrop.selected = new Set();
+      updateFilterLabel(collectionValue, selectedCollections);
+      updateFilterLabel(modelValue, selectedModels);
+      updateFilterLabel(backdropValue, selectedBackdrops);
+      syncFilterPills();
+      updateModelAndBackdropModalDataFromAttributes();
+      setStatus(READY_STATUS_TEXT);
+      searchGifts();
+    });
+
     resultsGrid.addEventListener("scroll", () => {
       maybeLoadMore();
     });
+
+    syncFilterPills();
+    updateStatusArea();
 
     document.addEventListener("DOMContentLoaded", async () => {
       await fetchCollections();
