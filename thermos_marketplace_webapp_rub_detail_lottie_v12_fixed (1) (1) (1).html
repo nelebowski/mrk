@@ -1356,7 +1356,7 @@
       requestAnimationFrame(() => maybeLoadMore());
     }
 
-      async function fetchGiftsPage(page) {
+    async function fetchGiftsPage(page) {
         const searchBody = currentSearchBody || buildSearchBody();
         const body = { ...searchBody, per_page: SERVER_PAGE_SIZE };
 
@@ -1391,14 +1391,18 @@
       const metaPage = meta && typeof meta.page === "number" ? meta.page : null;
 
       let nextPage = null;
-      if (metaNextPage != null) {
-        nextPage = metaNextPage;
-      } else if (metaNextToken != null) {
+      if (metaNextToken != null) {
         nextPage = metaNextToken;
+      } else if (metaNextPage != null) {
+        nextPage = metaNextPage;
       } else if (metaPage != null && hasMoreFromMeta !== false) {
         nextPage = metaPage + 1;
       } else if (typeof page === "number" && hasMoreFromMeta !== false) {
         nextPage = page + 1;
+      }
+
+      if (nextPage === page && nextPage != null) {
+        nextPage = null;
       }
 
       if (hasMoreFromMeta === false) {
@@ -1406,7 +1410,7 @@
       } else if (hasMoreFromMeta === true) {
         serverHasMore = nextPage != null;
       } else if (metaNextPage != null || metaNextToken != null) {
-        serverHasMore = true;
+        serverHasMore = nextPage != null;
       } else if (typeof page === "number") {
         serverHasMore = items.length === SERVER_PAGE_SIZE && nextPage != null;
       } else {
