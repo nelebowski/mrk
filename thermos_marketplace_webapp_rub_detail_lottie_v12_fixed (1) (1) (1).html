@@ -1373,6 +1373,17 @@
       }
       const data = await res.json();
       const meta = data && data.meta ? data.meta : null;
+      let nextPage = page + 1;
+      if (meta) {
+        if (meta.next_page != null) {
+          nextPage = meta.next_page;
+        } else if (meta.next_page_token != null) {
+          nextPage = meta.next_page_token;
+        } else if (meta.page != null && typeof meta.page === "number") {
+          nextPage = meta.page + 1;
+        }
+      }
+
       let items = (data && Array.isArray(data.items)) ? data.items : [];
       const filtered = items.filter(isOffchainGift);
 
@@ -1387,7 +1398,7 @@
           // можно пробовать следующую страницу.
           serverHasMore = items.length > 0;
         }
-        return;
+        return { nextPage };
       }
 
       lastGifts = lastGifts.concat(filtered);
@@ -1415,6 +1426,7 @@
       }
 
       buildCollectionModalItems();
+      return { nextPage };
     }
 
     async function searchGifts() {
@@ -1431,8 +1443,8 @@
 
       setStatus("Загрузка подарков…", true);
       try {
-        await fetchGiftsPage(serverPage);
-        serverPage += 1;
+        const { nextPage } = await fetchGiftsPage(serverPage);
+        serverPage = nextPage;
 
         if (!lastGifts.length) {
           clearResults();
@@ -1460,8 +1472,8 @@
         } else if (serverHasMore) {
           isLoadingMore = true;
           try {
-            await fetchGiftsPage(serverPage);
-            serverPage += 1;
+            const { nextPage } = await fetchGiftsPage(serverPage);
+            serverPage = nextPage;
             renderNextChunk();
           } catch (err) {
             console.error(err);
