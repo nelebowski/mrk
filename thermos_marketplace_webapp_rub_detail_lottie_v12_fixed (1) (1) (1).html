@@ -1356,16 +1356,18 @@
       requestAnimationFrame(() => maybeLoadMore());
     }
 
-    async function fetchGiftsPage(page) {
-      const searchBody = currentSearchBody || buildSearchBody();
-      const body = { ...searchBody };
+      async function fetchGiftsPage(page) {
+        const searchBody = currentSearchBody || buildSearchBody();
+        const body = { ...searchBody, per_page: SERVER_PAGE_SIZE };
 
-      let url = API_BASE + "/gifts?per_page=" + SERVER_PAGE_SIZE;
-      if (typeof page === "number") {
-        url += "&page=" + page;
-      } else if (page != null) {
-        url += "&page_token=" + encodeURIComponent(page);
-      }
+        let url = API_BASE + "/gifts?per_page=" + SERVER_PAGE_SIZE;
+        if (typeof page === "number") {
+          url += "&page=" + page;
+          body.page = page;
+        } else if (page != null) {
+          url += "&page_token=" + encodeURIComponent(page);
+          body.page_token = page;
+        }
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
