@@ -1383,21 +1383,32 @@
       let items = (data && Array.isArray(data.items)) ? data.items : [];
       const filtered = items.filter(isOffchainGift);
 
-      if (meta && typeof meta.has_more === "boolean") {
-        serverHasMore = meta.has_more;
-      } else {
-        serverHasMore = items.length > 0;
+      const hasMoreFromMeta = meta && typeof meta.has_more === "boolean" ? meta.has_more : null;
+      const metaNextPage = meta && meta.next_page != null ? meta.next_page : null;
+      const metaNextToken = meta && meta.next_page_token != null ? meta.next_page_token : null;
+      const metaPage = meta && typeof meta.page === "number" ? meta.page : null;
+
+      let nextPage = null;
+      if (metaNextPage != null) {
+        nextPage = metaNextPage;
+      } else if (metaNextToken != null) {
+        nextPage = metaNextToken;
+      } else if (metaPage != null && hasMoreFromMeta !== false) {
+        nextPage = metaPage + 1;
+      } else if (typeof page === "number" && hasMoreFromMeta !== false) {
+        nextPage = page + 1;
       }
 
-      let nextPage = typeof page === "number" ? page + 1 : page;
-      if (meta) {
-        if (meta.next_page != null) {
-          nextPage = meta.next_page;
-        } else if (meta.next_page_token != null) {
-          nextPage = meta.next_page_token;
-        } else if (meta.page != null && typeof meta.page === "number") {
-          nextPage = meta.page + 1;
-        }
+      if (hasMoreFromMeta === false) {
+        serverHasMore = false;
+      } else if (hasMoreFromMeta === true) {
+        serverHasMore = nextPage != null;
+      } else if (metaNextPage != null || metaNextToken != null) {
+        serverHasMore = true;
+      } else if (typeof page === "number") {
+        serverHasMore = items.length === SERVER_PAGE_SIZE && nextPage != null;
+      } else {
+        serverHasMore = false;
       }
 
       // Если на этой странице для нас нет подходящих подарков,
